@@ -6,7 +6,6 @@ Created on Jan 14, 2017
 import gym, numpy, time
 from utils import cv2_resize_image, preprocess_image
 
-
 class Game:
 
     def __init__(self, name, lost_life_as_terminal=False, take_maximum_of_two_frames=False):

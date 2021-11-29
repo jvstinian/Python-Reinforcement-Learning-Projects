@@ -6,7 +6,9 @@ Created on Nov 8, 2016
 import math, random
 import numpy, cv2
 import skimage.transform
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def preprocess_image(im, image_shape=(110, 84), crop_shape=84, crop_part='down'):

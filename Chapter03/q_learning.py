@@ -4,7 +4,9 @@ Created on Mar 25, 2018
 @author: ywz
 '''
 import numpy, random, os
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from replay_memory import ReplayMemory
 from optimizer import Optimizer
 from q_network import QNetwork

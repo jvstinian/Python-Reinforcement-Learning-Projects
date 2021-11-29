@@ -5,11 +5,12 @@ Created on Mar 28, 2018
 '''
 import os
 import argparse
-import tensorflow as tf
+#import tensorflow as tf
 from q_learning import DQN
-from config import ATARI, DEMO
+from config import ATARI, DEMO, DEMO_CNN
 from environment import new_atari_game, new_demo
-
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 def main():
     
@@ -32,6 +33,9 @@ def main():
         dqn = DQN(conf, game, model_dir, callback=game.draw)
     
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+        summary_writer = tf.summary.FileWriter(str(model_dir), sess.graph)
+        dqn.set_summary_writer(summary_writer)
+        sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
         dqn.load(sess, saver)
         dqn.evaluate(sess)

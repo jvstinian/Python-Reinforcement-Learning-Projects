@@ -3,7 +3,9 @@ Created on Mar 25, 2018
 
 @author: ywz
 '''
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from layers import conv2d, dense
 
 
@@ -39,11 +41,11 @@ class QNetwork:
         if self.network_type == 'cnn':
             self.net['conv1'] = conv2d(self.net['input'], 32, kernel=(8, 8), stride=(4, 4), 
                                        init_b=tf.constant_initializer(0.01), name='conv1')
-            self.net['conv2'] = conv2d(self.net['input'], 64, kernel=(4, 4), stride=(2, 2), 
+            self.net['conv2'] = conv2d(self.net['conv1'], 64, kernel=(4, 4), stride=(2, 2), 
                                        init_b=tf.constant_initializer(0.01), name='conv2')
-            self.net['conv3'] = conv2d(self.net['input'], 64, kernel=(3, 3), stride=(1, 1), 
+            self.net['conv3'] = conv2d(self.net['conv2'], 64, kernel=(3, 3), stride=(1, 1), 
                                        init_b=tf.constant_initializer(0.01), name='conv3')
-            self.net['feature'] = dense(self.net['conv2'], 512, 
+            self.net['feature'] = dense(self.net['conv3'], 512, 
                                         init_b=tf.constant_initializer(0.01), name='fc1')
         elif self.network_type == 'cnn_nips':
             self.net['conv1'] = conv2d(self.net['input'], 16, kernel=(8, 8), stride=(4, 4), 

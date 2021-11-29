@@ -3,7 +3,9 @@ Created on 29 May 2017
 
 @author: ywz
 '''
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from layer import conv2d, linear
 
 

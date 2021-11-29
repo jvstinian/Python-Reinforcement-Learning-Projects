@@ -3,7 +3,9 @@ Created on 31 May 2017
 
 @author: ywz
 '''
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from layer import conv2d, linear
 
 
@@ -37,7 +39,8 @@ class LSTMPolicy:
             self.net['feature'] = linear(self.net['fc1'], 50, init_b = tf.constant_initializer(0.0), name='fc2')
         
         num_units = self.net['feature'].get_shape().as_list()[-1]
-        self.lstm = tf.contrib.rnn.BasicLSTMCell(num_units=num_units, forget_bias=0.0, state_is_tuple=True)
+        # self.lstm = tf.contrib.rnn.BasicLSTMCell(num_units=num_units, forget_bias=0.0, state_is_tuple=True)
+        self.lstm = tf.nn.rnn_cell.BasicLSTMCell(num_units=num_units, forget_bias=0.0, state_is_tuple=True)
         self.init_state = self.lstm.zero_state(batch_size=1, dtype=tf.float32)
         
         step_size = tf.shape(self.x)[:1]

@@ -7,7 +7,7 @@ import multiprocessing as mp
 import traceback, random
 import sys, numpy
 import tensorflow as tf
-from joblib.pool import MemmapingPool
+from joblib.pool import MemmappingPool
 
 
 class SharedGlobal(object):
@@ -37,7 +37,7 @@ class StatefulPool(object):
         if n_parallel > 1:
             self.queue = mp.Queue()
             self.worker_queue = mp.Queue()
-            self.pool = MemmapingPool(self.n_parallel, temp_folder="/tmp")
+            self.pool = MemmappingPool(self.n_parallel, temp_folder="/tmp")
 
     def run_each(self, runner, args_list=None):
 

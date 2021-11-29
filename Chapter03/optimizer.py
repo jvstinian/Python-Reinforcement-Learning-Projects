@@ -4,12 +4,14 @@ Created on 4 Sep 2017
 @author: ywz
 '''
 import numpy
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from utils import flatten_tensor_variables
 from utils import unflatten_tensors, get_param_values
 from utils import get_param_assign_ops, set_param_values
 from krylov import Krylov
-
+from utils import create_optimizer
 
 class Hvp:
     
@@ -147,7 +149,69 @@ class ConjugateOptimizer:
                 print("Violated because constraint is violated")
             set_param_values(sess, self.param_assign_op, self.param_assign_tensor, old_param, flatten=True)
 
+class Optimizer:
+    
+    def __init__(self, config, feedback_size, 
+                 q_network, target_network, replay_memory):
+        
+        self.feedback_size = feedback_size
+        self.q_network = q_network
+        self.target_network = target_network
+        self.replay_memory = replay_memory
+        self.summary_writer = None
+        
+        self.gamma = config['gamma']
+        self.num_frames = config['num_frames']
+        
+        optimizer = create_optimizer(config['optimizer'], 
+                                     config['learning_rate'], 
+                                     config['rho'], 
+                                     config['rmsprop_epsilon'])
+        
+        self.train_op = optimizer.apply_gradients(
+                 zip(self.q_network.gradient, 
+                 self.q_network.vars))
+        
+    def set_summary_writer(self, summary_writer=None):
+        self.summary_writer = summary_writer
+        
+    def sample_transitions(self, sess, batch_size):
+        
+        w, h = self.feedback_size
+        states = numpy.zeros((batch_size, self.num_frames, w, h), 
+                             dtype=numpy.float32)
+        new_states = numpy.zeros((batch_size, self.num_frames, w, h), 
+                                 dtype=numpy.float32)
+        targets = numpy.zeros(batch_size, dtype=numpy.float32)
+        actions = numpy.zeros(batch_size, dtype=numpy.int32)
+        terminations = numpy.zeros(batch_size, dtype=numpy.int32)
+        
+        for i in range(batch_size):
+            state, action, r, new_state, t = self.replay_memory.sample()
+            states[i] = state
+            new_states[i] = new_state
+            actions[i] = action
+            targets[i] = r
+            terminations[i] = t
 
+        targets += self.gamma * (1 - terminations) * self.target_network.get_q_value(sess, new_states)
+        return states, actions, targets    
+
+    def train_one_step(self, sess, step, batch_size):
+        
+        states, actions, targets = self.sample_transitions(sess, batch_size)
+        feed_dict = self.q_network.get_feed_dict(states, actions, targets)
+        
+        if self.summary_writer and step % 1000 == 0:
+            summary_str, _, = sess.run([self.q_network.summary_op, 
+                                        self.train_op], 
+                                       feed_dict=feed_dict)
+            self.summary_writer.add_summary(summary_str, step)
+            self.summary_writer.flush()
+        else:
+            sess.run(self.train_op, feed_dict=feed_dict)
+
+    
 if __name__ == "__main__":
     
     n = 5

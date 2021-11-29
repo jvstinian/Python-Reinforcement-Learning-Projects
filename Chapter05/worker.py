@@ -5,7 +5,9 @@ Created on 29 May 2017
 '''
 import numpy, time, random
 import argparse, os, sys, signal
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from a3c import A3C
 from cluster import cluster_spec
 from environment import new_environment

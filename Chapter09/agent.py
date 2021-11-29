@@ -35,8 +35,8 @@ class Agent:
         self.inventory = []
         self.is_eval = is_eval
         
-        self.gamma = 0.99
-        self.tau = 0.001
+        self.gamma = 0.9999 # 0.99 # TODO: Changed this
+        self.tau = 0.01 # 0.001 # TODO: changed this
         
         self.actor_local = Actor(self.state_size, self.action_size)
         self.actor_target = Actor(self.state_size, self.action_size)    
@@ -49,6 +49,7 @@ class Agent:
         
     def act(self, state):
         options = self.actor_local.model.predict(state)
+        # print("In act(...), got options=%s" % (options,))
         self.last_state = state
         if not self.is_eval:
             return choice(range(3), p = options[0])
@@ -59,7 +60,7 @@ class Agent:
         if len(self.memory) > self.batch_size:
             experiences = self.memory.sample(self.batch_size)
             self.learn(experiences)
-            self.last_state = next_state
+        self.last_state = next_state # TODO: I changed this
 
     def learn(self, experiences):               
         states = np.vstack([e.state for e in experiences if e is not None]).astype(np.float32).reshape(-1,self.state_size)    
@@ -75,6 +76,15 @@ class Agent:
         self.critic_local.model.train_on_batch(x = [states, actions], y=Q_targets)
         
         action_gradients = np.reshape(self.critic_local.get_action_gradients([states, actions, 0]),(-1, self.action_size))
+        # with np.printoptions(threshold=np.inf): 
+        #     print('States: ')
+        #     print(states)
+        #     # print('States: %s' % (states))
+        # print('Actions: %s' % (actions))
+        # print('Action gradients: %s' %  (action_gradients))
+        # print('Shape of states: %s' % (states.shape,))
+        # print('Shape of actions: %s' % (actions.shape,))
+        # print('Action gradients shape: %s' % (action_gradients.shape,))
         self.actor_local.train_fn([states, action_gradients, 1])
         self.soft_update(self.critic_local.model, self.critic_target.model)  
         self.soft_update(self.actor_local.model, self.actor_target.model)

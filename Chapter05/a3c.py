@@ -4,7 +4,9 @@ Created on 29 May 2017
 @author: ywz
 '''
 import numpy, os
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from ff_policy import FFPolicy
 from lstm_policy import LSTMPolicy
 from utils import update_target_graph, create_optimizer

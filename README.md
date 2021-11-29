@@ -1,3 +1,12 @@
+# Changes in this fork
+
+This fork includes 
+* changes to imports to support running the tensorflow v1 code in this repo using tensorflow v2,
+* filling in some gaps in the code, and
+* minor fixes.
+
+This fork is primarily for experimentation.
+
 # Python Reinforcement Learning Projects
 
 <a href="https://www.packtpub.com/big-data-and-business-intelligence/python-reinforcement-learning-projects?utm_source=github&utm_medium=repository&utm_campaign=9781788991612"><img src="https://dz13w8afd47il.cloudfront.net/sites/default/files/imagecache/ppv4_main_book_cover/B10144.png" alt="Python Reinforcement Learning Projects" height="256px" align="right"></a>

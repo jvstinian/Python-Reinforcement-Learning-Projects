@@ -10,12 +10,12 @@ def formatPrice(n):
     return curr + "{0:.2f}".format(abs(n))
 
 
-def getStockData(key):
+def getStockData(key, price_col=4):
     datavec = []
     lines = open("data/" + key + ".csv", "r").read().splitlines()
     
     for line in lines[1:]:
-        datavec.append(float(line.split(",")[4]))
+        datavec.append(float(line.split(",")[price_col]))
     
     return datavec
   

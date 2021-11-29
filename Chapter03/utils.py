@@ -4,8 +4,12 @@ Created on 4 Sep 2017
 @author: ywz
 '''
 import numpy
+import cv2
 import scipy.signal
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 
 def flatten_tensor_variables(ts):
     return tf.concat(axis=0, values=[tf.reshape(x, [-1]) for x in ts])
@@ -67,5 +71,39 @@ def iterate_minibatches(input_list=None, batch_size=None, shuffle=False):
     for start_idx in range(0, len(input_list[0]), batch_size):
         idx = indices[start_idx:start_idx + batch_size] if shuffle else slice(start_idx, start_idx + batch_size)
         yield [r[idx] for r in input_list]
-        
+
+
+def create_optimizer(method, learning_rate, rho, epsilon):
     
+    if method == 'rmsprop':
+        opt = tf.train.RMSPropOptimizer(learning_rate=learning_rate, 
+                                        decay=rho,
+                                        epsilon=epsilon)
+    elif method == 'adam':
+        opt = tf.train.AdamOptimizer(learning_rate=learning_rate,
+                                     beta1=rho)
+    elif method == 'momentum':
+        opt = tf.train.MomentumOptimizer(
+            learning_rate=learning_rate, 
+            momentum=rho)
+    else:
+        raise ValueError('optimizer method %s not supported' % (method))
+    
+    return opt
+ 
+def cv2_resize_image(image, resized_shape=(84, 84), method='crop', crop_offset=8):
+        
+        height, width = image.shape
+        resized_height, resized_width = resized_shape
+        
+        if method == 'crop':
+            h = int(round(float(height) * resized_width / width))
+            resized = cv2.resize(image, (resized_width, h), interpolation=cv2.INTER_LINEAR)
+            crop_y_cutoff = h - crop_offset - resized_height
+            cropped = resized[crop_y_cutoff : crop_y_cutoff + resized_height, :]
+            return numpy.asarray(cropped, dtype=numpy.uint8)
+        elif method == 'scale':
+            return numpy.asarray(cv2.resize(image, (resized_width, resized_height), 
+                                            interpolation=cv2.INTER_LINEAR), dtype=numpy.uint8)
+        else:
+            raise ValueError('Unrecognized image resize method.')

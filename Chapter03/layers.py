@@ -4,7 +4,10 @@ Created on Mar 25, 2018
 @author: ywz
 '''
 import numpy
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 
 
 def get_variable(shape, initializer, name, dtype=tf.float32, trainable=True):

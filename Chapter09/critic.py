@@ -1,4 +1,4 @@
-from keras import layers, models, optimizers
+from keras import layers, models, optimizers, regularizers, initializers
 from keras import backend as K
 
 
@@ -23,18 +23,18 @@ class Critic:
         states = layers.Input(shape=(self.state_size,), name='states')
         actions = layers.Input(shape=(self.action_size,), name='actions')
 
-        net_states = layers.Dense(units=16,kernel_regularizer=layers.regularizers.l2(1e-6))(states)
+        net_states = layers.Dense(units=16,kernel_regularizer=regularizers.l2(1e-6))(states)
         net_states = layers.BatchNormalization()(net_states)
         net_states = layers.Activation("relu")(net_states)
 
-        net_states = layers.Dense(units=32, kernel_regularizer=layers.regularizers.l2(1e-6))(net_states)
+        net_states = layers.Dense(units=32, kernel_regularizer=regularizers.l2(1e-6))(net_states)
 
-        net_actions = layers.Dense(units=32,kernel_regularizer=layers.regularizers.l2(1e-6))(actions)
+        net_actions = layers.Dense(units=32,kernel_regularizer=regularizers.l2(1e-6))(actions)
 
         net = layers.Add()([net_states, net_actions])
         net = layers.Activation('relu')(net)
 
-        Q_values = layers.Dense(units=1, name='q_values',kernel_initializer=layers.initializers.RandomUniform(minval=-0.003, maxval=0.003))(net)
+        Q_values = layers.Dense(units=1, name='q_values',kernel_initializer=initializers.RandomUniform(minval=-0.003, maxval=0.003))(net)
 
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 

@@ -4,7 +4,9 @@ Created on 29 May 2017
 @author: ywz
 '''
 import numpy
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def leaky_relu(x, leak=0.0, name="lrelu"):
